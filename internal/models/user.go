@@ -3,10 +3,12 @@ package models
 import "time"
 
 type User struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Name      string    `json:"name" gorm:"size:100;not null"`
-	Email     string    `json:"email" gorm:"size:100;uniqueIndex;not null"`
-	Password  string    `json:"-" gorm:"size:255;not null"` // Password is not exposed in JSON responses
+	ID       uint   `json:"id" gorm:"primaryKey"`
+	Name     string `json:"name" gorm:"size:100;not null"`
+	Email    string `json:"email" gorm:"size:100;uniqueIndex;not null"`
+	Password string `json:"-" gorm:"size:255;not null"` // Password is not exposed in JSON responses
+	Role     string `json:"role" gorm:"type:varchar(20);default:'USER'"`
+
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -16,6 +18,7 @@ type UserResponse struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
+	Role      string    `json:"role"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -26,6 +29,7 @@ func (u *User) ToUserResponse() UserResponse {
 		ID:        u.ID,
 		Name:      u.Name,
 		Email:     u.Email,
+		Role:      u.Role,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}

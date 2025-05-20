@@ -1,17 +1,19 @@
 package services
 
 import (
-	"Cars/internal/migrations"
 	_ "Cars/internal/models"
+	"log"
+
+	"Cars/internal/migrations"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
 )
 
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	dsn := "host=localhost user=postgres password=21012023 dbname=Carss port=5432 sslmode=disable TimeZone=Asia/Almaty"
+	dsn := "host=localhost user=postgres password=postgres dbname=Cars port=5432"
 	var err error
 
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

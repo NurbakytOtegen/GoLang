@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"github.com/Kabyl/Cars-Goland-Project/internal/models"
-	"github.com/Kabyl/Cars-Goland-Project/internal/services"
-	"github.com/gin-gonic/gin"
+	"Cars/internal/models"
+	"Cars/internal/services"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func RegisterUserRoutes(router *gin.Engine) {

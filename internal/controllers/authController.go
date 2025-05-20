@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"github.com/Kabyl/Cars-Goland-Project/internal/middleware"
-	"github.com/Kabyl/Cars-Goland-Project/internal/models"
-	"github.com/Kabyl/Cars-Goland-Project/internal/services"
-	"github.com/gin-gonic/gin"
+	"Cars/internal/middleware"
+	"Cars/internal/models"
+	"Cars/internal/services"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // RegisterAuthRoutes registers the authentication routes

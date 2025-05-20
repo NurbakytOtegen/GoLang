@@ -21,3 +21,13 @@ func UpdateCar(id string, car models.Car) {
 func DeleteCar(id string) {
 	DB.Delete(&models.Car{}, id)
 }
+
+func GetCarByID(id string) (*models.Car, error) {
+	var car models.Car
+	result := DB.First(&car, id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &car, nil
+}

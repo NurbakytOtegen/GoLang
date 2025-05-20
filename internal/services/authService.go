@@ -4,10 +4,11 @@ import (
 	"Cars/internal/models"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"time"
 )
 
 // JWT secret key - in production, this should be stored in environment variables
@@ -92,11 +93,17 @@ func RegisterUser(registerRequest models.RegisterRequest) (*models.User, error) 
 		return nil, err
 	}
 
+	role := registerRequest.Role
+	if role == "" {
+		role = "USER"
+	}
+
 	// Create new user
 	user := models.User{
 		Name:     registerRequest.Name,
 		Email:    registerRequest.Email,
 		Password: hashedPassword,
+		Role:     role,
 	}
 
 	// Save user to database

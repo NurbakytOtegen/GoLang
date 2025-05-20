@@ -1,18 +1,35 @@
 package controllers
 
 import (
+	"net/http"
+
+	"Cars/internal/middleware"
 	"Cars/internal/models"
 	"Cars/internal/services"
+
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
-// Роуттарды тіркеу
+// // Роуттарды тіркеу
+// func RegisterCarRoutes(router *gin.Engine) {
+// 	router.GET("/cars", getCars)
+// 	router.POST("/cars", createCar)
+// 	router.PUT("/cars/:id", updateCar)
+// 	router.DELETE("/cars/:id", deleteCar)
+// }
+
 func RegisterCarRoutes(router *gin.Engine) {
 	router.GET("/cars", getCars)
-	router.POST("/cars", createCar)
-	router.PUT("/cars/:id", updateCar)
-	router.DELETE("/cars/:id", deleteCar)
+	router.GET("/cars/:id", middleware.AuthMiddleware(), GetCarByID)
+
+	carGroup := router.Group("/cars")
+	carGroup.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("ADMIN"))
+
+	{
+		carGroup.POST("", createCar)
+		carGroup.PUT("/:id", updateCar)
+		carGroup.DELETE("/:id", deleteCar)
+	}
 }
 
 // Барлық көліктерді алу
@@ -49,4 +66,14 @@ func deleteCar(c *gin.Context) {
 	id := c.Param("id")
 	services.DeleteCar(id)
 	c.JSON(http.StatusOK, gin.H{"message": "Car deleted"})
+}
+
+func GetCarByID(c *gin.Context) {
+	id := c.Param("id")
+	car, err := services.GetCarByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Car not found"})
+		return
+	}
+	c.JSON(http.StatusOK, car)
 }
