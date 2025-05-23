@@ -23,7 +23,7 @@ func RegisterCarRoutes(router *gin.Engine) {
 	router.GET("/cars/:id", middleware.AuthMiddleware(), GetCarByID)
 
 	carGroup := router.Group("/cars")
-	carGroup.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("ADMIN"))
+	carGroup.Use(middleware.AuthMiddleware(), middleware.RoleMiddleware("ADMIN", "SUPER_ADMIN"))
 
 	{
 		carGroup.POST("", createCar)
@@ -64,8 +64,11 @@ func updateCar(c *gin.Context) {
 // Көлікті өшіру
 func deleteCar(c *gin.Context) {
 	id := c.Param("id")
-	services.DeleteCar(id)
-	c.JSON(http.StatusOK, gin.H{"message": "Car deleted"})
+	if err := services.DeleteCar(id); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Car deleted successfully"})
 }
 
 func GetCarByID(c *gin.Context) {

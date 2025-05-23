@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"Cars/internal/models"
 	"Cars/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -38,8 +39,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Set the user ID in the context
+		// Get the full user object
+		user, err := services.GetUserByID(userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+			c.Abort()
+			return
+		}
+
+		// Set both userID and full user object in the context
 		c.Set("userID", userID)
+		c.Set("user", user)
 
 		// Continue to the next handler
 		c.Next()
@@ -49,24 +59,28 @@ func AuthMiddleware() gin.HandlerFunc {
 // RoleMiddleware checks if a user has one of the required roles
 func RoleMiddleware(allowedRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userIDValue, exists := c.Get("userID")
+		user, exists := c.Get("user")
 		if !exists {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
 
-		userID := userIDValue.(uint)
-		user, err := services.GetUserByID(userID)
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+		if userObj, ok := user.(*models.User); !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Invalid user data"})
 			return
-		}
-
-		for _, role := range allowedRoles {
-			if user.Role == role {
-				c.Set("user", *user) // можно сохранить user в контекст
+		} else {
+			// SUPER_ADMIN has access to everything
+			if userObj.Role == "SUPER_ADMIN" {
 				c.Next()
 				return
+			}
+
+			// Check other roles
+			for _, role := range allowedRoles {
+				if userObj.Role == role {
+					c.Next()
+					return
+				}
 			}
 		}
 

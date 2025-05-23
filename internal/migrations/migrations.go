@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// GetMigrations returns all migrations in the correct order
 func GetMigrations(db *gorm.DB) *gormigrate.Gormigrate {
 	return gormigrate.New(db, gormigrate.DefaultOptions, []*gormigrate.Migration{
 		{
@@ -18,5 +19,10 @@ func GetMigrations(db *gorm.DB) *gormigrate.Gormigrate {
 				return tx.Migrator().DropTable("users", "cars")
 			},
 		},
+		AddReviewsAndRatings(),
+		AddCarTypeGorm(),
+		AddUserBlocked(),
+		FixReviewsCascade(),
+		AddFavorites(),
 	})
 }

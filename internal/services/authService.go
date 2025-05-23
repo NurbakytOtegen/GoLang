@@ -37,6 +37,7 @@ func GenerateToken(user models.User) (string, error) {
 	// Create claims with user ID and standard claims
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
+		"role":    user.Role,
 		"exp":     expirationTime.Unix(),
 		"iat":     time.Now().Unix(),
 	}
